@@ -1,0 +1,148 @@
+import java.util.Scanner;
+
+public class Main {
+
+  static Scanner scanner = new Scanner(System.in);
+
+  static int income = 0;
+  static int outlay = 0;
+
+  public static void boarder() {
+    System.out.println("_______________");
+  }
+
+  public static void main(String[] args) {
+
+    while (true) {
+
+      System.out.println("Выберите операцию введя её номер:");
+      System.out.println("1. Добавить новый доход");
+      System.out.println("2. Добавить новый расход");
+      System.out.println("3. Рассчитать лучшую систему налогообложения");
+      System.out.println();
+      System.out.println("Введите end чтобы закрыть программу");
+      boarder();
+
+      if (income != 0) {
+        System.out.println("Уже указано доходов на сумму " + income + " рублей.");
+      }
+
+      if (outlay != 0) {
+        System.out.println("Уже указано расходов на сумму " + outlay + " рублей.");
+      }
+
+      if (income <= outlay && income >= 0.1) {
+        System.out.println("ВАШИ РАСХОДЫ ПРЕВЫШАЮТ ДОХОДЫ! Стоит задуматься о актуальности вашего бизнеса!");
+      }
+
+      if (income != 0 || outlay != 0) {
+        boarder();
+      }
+
+      String input = scanner.nextLine();
+
+      if ("end".equals(input)) {
+        System.out.println("Вы вышли из программы.");
+        break;
+      }
+
+      int operationSelection = Integer.parseInt(input);
+
+      switch (operationSelection) {
+        case 1:
+          System.out.println("Введите сумму дохода");
+          String newIncomeStr = scanner.nextLine();
+          int newIncome = Integer.parseInt(newIncomeStr);
+          if (newIncome <= 0) {
+            System.out.println("Доходы не могут быть отрицательными, так как это будут уже расходы.");
+            boarder();
+            continue;
+          }
+          income += newIncome;
+          continue;
+        case 2:
+          System.out.println("Введите сумму расхода");
+          String newOutlayStr = scanner.nextLine();
+          int newOutlay = Integer.parseInt(newOutlayStr);
+          if (newOutlay <= 0) {
+            System.out.println("Расходы не могут быть отрицательными, так как это будут уже доходы.");
+            boarder();
+            continue;
+          }
+          outlay += newOutlay;
+          continue;
+        case 3:
+          if (income == 0) {
+            System.out.println("Нет данных о доходах, добавьте хотя бы один доход");
+            boarder();
+            continue;
+          }
+          // решил не писать две вариации расчёта разницы между налогами, сократив код и
+          // отбросив знак.\/
+          int taxDifference = Math.abs(taxIncomeMinusOutlay(income, outlay) - taxIncome(income));
+
+          if (taxIncome(income) == taxIncomeMinusOutlay(income, outlay)) {
+            System.out.println("Ващ налог по любой из систем будет одинаковым. Можете использовать любую систему.");
+            System.out.println("При доходах в " + income + " рублей и расходах в " + outlay + " рублей:");
+            System.out.println("Ваш налог составит: " + taxIncome(income) + " рублей.");
+            boarder();
+            income = 0;
+            outlay = 0;
+            break;
+
+          } else if (taxIncome(income) >= taxIncomeMinusOutlay(income, outlay)) {
+            System.out.println("Советуем вам использовать УСН доходы минус расходы.");
+            System.out.println("При доходах в " + income + " рублей и расходах в " + outlay + " рублей:");
+            System.out.println("Ваш налог составит: " + taxIncomeMinusOutlay(income, outlay) + " рублей.");
+            System.out.println("Налог при использовании другой системы: " + taxIncome(income) + " рублей.");
+            System.out.println("Таким образом вы сэкономите " + taxDifference + " рублей");
+            boarder();
+            income = 0;
+            outlay = 0;
+            break;
+
+          } else if (taxIncomeMinusOutlay(income, outlay) >= taxIncome(income)) {
+            System.out.println("Советуем вам использовать УСН доходы.");
+            System.out.println("При доходах в " + income + " рублей и расходах в " + outlay + " рублей:");
+            System.out.println("Ваш налог составит: " + taxIncome(income) + " рублей.");
+            System.out.println(
+                "Налог при использовании другой системы: " + taxIncomeMinusOutlay(income, outlay) + " рублей.");
+            System.out.println("Таким образом вы сэкономите " + taxDifference + " рублей");
+            boarder();
+            income = 0;
+            outlay = 0;
+            break;
+          }
+
+        default:
+          System.out.println("Такой операции нет");
+          boarder();
+      }
+
+    }
+
+  }
+
+  public static int taxIncome(int income) {
+    // Для боле1е высокой читаемости назову интовую переменную по сокращению метода
+    // (taxIncome - taxI)
+    int taxI = income * 6 / 100;
+    if (taxI >= 0) {
+      return taxI;
+    } else {
+      return 0;
+    }
+  }
+
+  public static int taxIncomeMinusOutlay(int income, int outlay) {
+    // Для более высокой читаемости назову интовую переменную по сокращению метода
+    // (taxIncomeMinusOutlay - taxIMO)
+    int taxIMO = (income - outlay) * 15 / 100;
+    if (taxIMO >= 0) {
+      return taxIMO;
+    } else {
+      return 0;
+    }
+  }
+
+}
